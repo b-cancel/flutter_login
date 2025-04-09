@@ -1,5 +1,6 @@
 library;
 
+import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:another_transformer_page_view/another_transformer_page_view.dart';
@@ -258,9 +259,9 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
 
     widget.onSubmit?.call();
 
-    return _formLoadingController
-        .reverse()
-        .then((_) => _routeTransitionController.forward());
+    return _formLoadingController.reverse().then((_) {
+      return _routeTransitionController.forward();
+    });
   }
 
   void _reverseChangeRouteAnimation() {
@@ -433,10 +434,8 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
               if (requireSignupConfirmation) {
                 _changeCard(_confirmSignup);
               } else if (widget.loginAfterSignUp) {
-                _forwardChangeRouteAnimation(_additionalSignUpCardKey)
-                    .then((_) {
-                  widget.onSubmitCompleted?.call();
-                });
+                dev.log("WATCH 1 loginAfterSignUp");
+                widget.onSubmitCompleted?.call();
               } else {
                 _changeCard(_loginPageIndex);
               }
@@ -465,9 +464,8 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
             loadingController: formController,
             onSubmitCompleted: () {
               if (widget.loginAfterSignUp) {
-                _forwardChangeRouteAnimation(_confirmSignUpCardKey).then((_) {
-                  widget.onSubmitCompleted?.call();
-                });
+                dev.log("WATCH 2 loginAfterSignUp");
+                widget.onSubmitCompleted?.call();
               } else {
                 _changeCard(_loginPageIndex);
               }

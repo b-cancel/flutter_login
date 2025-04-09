@@ -266,7 +266,7 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
         setState(() => _isSubmitting = false);
         return false;
       }
-    } else {
+    } else if (auth.isLogin) {
       final requireSignUpConfirmationViaLogin =
           await widget.requireSignUpConfirmationViaLogin();
       if (requireSignUpConfirmationViaLogin) {
