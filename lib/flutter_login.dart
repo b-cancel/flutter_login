@@ -366,7 +366,7 @@ class FlutterLogin extends StatefulWidget {
 
   /// Called after the submit animation's completed. Put your route transition
   /// logic here. Recommend to use with [logoTag] and [titleTag]
-  final VoidCallback? onSubmitAnimationCompleted;
+  final Future<void> Function(BuildContext context)? onSubmitAnimationCompleted;
 
   /// Hero tag for logo image. If not specified, it will simply fade out when
   /// changing route
