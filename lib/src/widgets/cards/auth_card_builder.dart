@@ -1,6 +1,5 @@
 library;
 
-import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:another_transformer_page_view/another_transformer_page_view.dart';
@@ -236,7 +235,7 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
     return null;
   }
 
-  Future<void> _forwardChangeRouteAnimation(GlobalKey cardKey) {
+  Future<void> _forwardChangeRouteAnimation(GlobalKey cardKey) async {
     final deviceSize = MediaQuery.of(context).size;
     final cardSize = getWidgetSize(cardKey)!;
     final widthRatio = deviceSize.width / cardSize.height + 2;
@@ -259,9 +258,15 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
 
     widget.onSubmit?.call();
 
-    return _formLoadingController.reverse().then((_) {
-      return _routeTransitionController.forward();
-    });
+    if (_formLoadingController.isCompleted) {
+      _formLoadingController.reset();
+    }
+    await _formLoadingController.reverse();
+    if (_routeTransitionController.isCompleted) {
+      _routeTransitionController.reset();
+    }
+    await _routeTransitionController.forward();
+    return;
   }
 
   void _reverseChangeRouteAnimation() {
@@ -434,8 +439,10 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
               if (requireSignupConfirmation) {
                 _changeCard(_confirmSignup);
               } else if (widget.loginAfterSignUp) {
-                dev.log("WATCH 1 loginAfterSignUp");
-                widget.onSubmitCompleted?.call();
+                _forwardChangeRouteAnimation(_additionalSignUpCardKey)
+                    .then((_) {
+                  widget.onSubmitCompleted?.call();
+                });
               } else {
                 _changeCard(_loginPageIndex);
               }
@@ -464,8 +471,9 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
             loadingController: formController,
             onSubmitCompleted: () {
               if (widget.loginAfterSignUp) {
-                dev.log("WATCH 2 loginAfterSignUp");
-                widget.onSubmitCompleted?.call();
+                _forwardChangeRouteAnimation(_confirmSignUpCardKey).then((_) {
+                  widget.onSubmitCompleted?.call();
+                });
               } else {
                 _changeCard(_loginPageIndex);
               }
