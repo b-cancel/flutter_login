@@ -1,4 +1,4 @@
-library auth_card_builder;
+library;
 
 import 'dart:math';
 
@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:flutter_login/src/utils/constants.dart';
 import 'package:flutter_login/src/utils/dart_helper.dart';
-
 import 'package:flutter_login/src/utils/matrix.dart';
 import 'package:flutter_login/src/utils/text_field_utils.dart';
 import 'package:flutter_login/src/utils/widget_helper.dart';
@@ -340,6 +339,18 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
   Widget _changeToCard(BuildContext context, int index) {
     final auth = Provider.of<Auth>(context, listen: false);
     final formController = _formLoadingController;
+    Future<bool> requireSignUpConfirmationViaLogin() async {
+      final confirmSignUpViaLoginRequired =
+          await auth.confirmSignUpRequiredViaLogin?.call(
+                LoginData(
+                  name: auth.email,
+                  password: auth.password,
+                ),
+              ) ??
+              true;
+      return auth.onConfirmSignup != null && confirmSignUpViaLoginRequired;
+    }
+
     // if (!_isLoadingFirstTime) formController = _formLoadingController..value = 1.0;
     Future<bool> requireSignUpConfirmation() async {
       final confirmSignupRequired = await auth.confirmSignupRequired?.call(
@@ -373,6 +384,8 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
                 widget.onSubmitCompleted?.call();
               });
             },
+            requireSignUpConfirmationViaLogin:
+                requireSignUpConfirmationViaLogin,
             requireSignUpConfirmation: requireSignUpConfirmation,
             onSwitchConfirmSignup: () => _changeCard(_confirmSignup),
             hideSignUpButton: widget.hideSignUpButton,

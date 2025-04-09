@@ -302,6 +302,7 @@ class FlutterLogin extends StatefulWidget {
     this.termsOfService = const <TermOfService>[],
     this.onConfirmRecover,
     this.onConfirmSignup,
+    this.confirmSignUpRequiredViaLogin,
     this.confirmSignupRequired,
     this.onResendCode,
     this.savedEmail = '',
@@ -416,6 +417,10 @@ class FlutterLogin extends StatefulWidget {
   /// Called when the user hits the submit button when in confirm signup mode
   /// Optional
   final ConfirmSignupCallback? onConfirmSignup;
+
+  // Additional option to decide in runtime if confirmation is required
+  // Optional
+  final ConfirmSignupRequiredCallback? confirmSignUpRequiredViaLogin;
 
   // Additional option to decide in runtime if confirmation is required
   // Optional
@@ -805,6 +810,7 @@ class _FlutterLoginState extends State<FlutterLogin>
             confirmPassword: widget.savedPassword,
             onConfirmRecover: widget.onConfirmRecover,
             onConfirmSignup: widget.onConfirmSignup,
+            confirmSignUpRequiredViaLogin: widget.confirmSignUpRequiredViaLogin,
             confirmSignupRequired: widget.confirmSignupRequired,
             beforeAdditionalFieldsCallback: widget.onSwitchToAdditionalFields,
             onResendCode: widget.onResendCode,

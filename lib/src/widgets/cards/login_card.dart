@@ -15,6 +15,7 @@ class _LoginCard extends StatefulWidget {
     required this.userType,
     required this.requireAdditionalSignUpFields,
     required this.onSwitchConfirmSignup,
+    required this.requireSignUpConfirmationViaLogin,
     required this.requireSignUpConfirmation,
     this.onSubmitCompleted,
     this.hideForgotPasswordButton = false,
@@ -39,6 +40,7 @@ class _LoginCard extends StatefulWidget {
   final bool hideProvidersTitle;
   final LoginUserType userType;
   final bool requireAdditionalSignUpFields;
+  final Future<bool> Function() requireSignUpConfirmationViaLogin;
   final Future<bool> Function() requireSignUpConfirmation;
   final Widget? introWidget;
   final String? initialIsoCode;
@@ -264,6 +266,14 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
         setState(() => _isSubmitting = false);
         return false;
       }
+    } else {
+      final requireSignUpConfirmationViaLogin =
+          await widget.requireSignUpConfirmationViaLogin();
+      if (requireSignUpConfirmationViaLogin) {
+        widget.onSwitchConfirmSignup();
+        _switchAuthMode();
+        return false;
+      }
     }
     TextInput.finishAutofillContext();
     widget.onSubmitCompleted?.call();
@@ -382,7 +392,11 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
       loadingController: widget.loadingController,
       interval: _nameTextFieldLoadingAnimationInterval,
       labelText: messages.userHint ?? getLabelText(widget.userType),
-      autofillHints: _isSubmitting ? null : [getAutofillHints(widget.userType)],
+
+      /// ! this was previously _isSubmitting ? null : [getAutofillHints(widget.userType)],
+      /// 1. I've no idea why anybody would have the autofill hint be NULL when submitting
+      /// 2. in order for autofill to be triggered an work the hint has to be username
+      autofillHints: [getAutofillHints(widget.userType)],
       prefixIcon: getPrefixIcon(widget.userType),
       keyboardType: getKeyboardType(widget.userType),
       textInputAction: TextInputAction.next,
@@ -403,11 +417,14 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
       loadingController: widget.loadingController,
       interval: _passTextFieldLoadingAnimationInterval,
       labelText: messages.passwordHint,
-      autofillHints: _isSubmitting
-          ? null
-          : (auth.isLogin
-              ? [AutofillHints.password]
-              : [AutofillHints.newPassword]),
+
+      /// ! this was previously_isSubmitting ? null : (auth.isLogin ? [AutofillHints.password] : [AutofillHints.newPassword]),
+      /// 1. I've no idea why anybody would have the autofill hint be NULL when submitting
+      /// 2. in order for autofill to be triggered an work the hint has to be username
+      autofillHints: (auth.isLogin
+          ? [AutofillHints.password]
+          : [AutofillHints.newPassword]),
+      keyboardType: TextInputType.visiblePassword,
       controller: _passController,
       textInputAction:
           auth.isLogin ? TextInputAction.done : TextInputAction.next,
@@ -439,6 +456,8 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
       inertiaController: _postSwitchAuthController,
       inertiaDirection: TextFieldInertiaDirection.right,
       labelText: messages.confirmPasswordHint,
+      autofillHints: const [AutofillHints.newPassword],
+      keyboardType: TextInputType.visiblePassword,
       controller: _confirmPassController,
       textInputAction: TextInputAction.done,
       focusNode: _confirmPasswordFocusNode,

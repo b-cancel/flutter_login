@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_login/flutter_login.dart';
 
 enum AuthMode { signup, login }
@@ -52,6 +51,7 @@ class Auth with ChangeNotifier {
     this.onRecoverPassword,
     this.onConfirmRecover,
     this.onConfirmSignup,
+    this.confirmSignUpRequiredViaLogin,
     this.confirmSignupRequired,
     this.onResendCode,
     this.beforeAdditionalFieldsCallback,
@@ -71,6 +71,7 @@ class Auth with ChangeNotifier {
   final List<LoginProvider> loginProviders;
   final ConfirmRecoverCallback? onConfirmRecover;
   final ConfirmSignupCallback? onConfirmSignup;
+  final ConfirmSignupRequiredCallback? confirmSignUpRequiredViaLogin;
   final ConfirmSignupRequiredCallback? confirmSignupRequired;
   final SignupCallback? onResendCode;
   final List<TermOfService> termsOfService;

@@ -15,7 +15,9 @@ String getAutofillHints(LoginUserType userType) {
       return AutofillHints.telephoneNumber;
     case LoginUserType.email:
     default:
-      return AutofillHints.email;
+
+      /// ! this is required in order to trigger default keychain autofill behavior
+      return AutofillHints.username;
   }
 }
 
