@@ -439,10 +439,8 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
               if (requireSignupConfirmation) {
                 _changeCard(_confirmSignup);
               } else if (widget.loginAfterSignUp) {
-                _forwardChangeRouteAnimation(_additionalSignUpCardKey)
-                    .then((_) {
-                  widget.onSubmitCompleted?.call(context);
-                });
+                widget.onSubmitCompleted?.call(context);
+                _forwardChangeRouteAnimation(_additionalSignUpCardKey);
               } else {
                 _changeCard(_loginPageIndex);
               }
@@ -471,9 +469,8 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
             loadingController: formController,
             onSubmitCompleted: () {
               if (widget.loginAfterSignUp) {
-                _forwardChangeRouteAnimation(_confirmSignUpCardKey).then((_) {
-                  widget.onSubmitCompleted?.call(context);
-                });
+                widget.onSubmitCompleted?.call(context);
+                _forwardChangeRouteAnimation(_confirmSignUpCardKey);
               } else {
                 _changeCard(_loginPageIndex);
               }
