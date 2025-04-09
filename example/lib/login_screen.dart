@@ -261,7 +261,7 @@ class LoginScreen extends StatelessWidget {
         }
         return _signupUser(signupData);
       },
-      onSubmitAnimationCompleted: () {
+      onSubmitAnimationCompleted: (context) async {
         Navigator.of(context).pushReplacement(
           FadePageRoute(
             builder: (context) => const DashboardScreen(),

@@ -61,7 +61,7 @@ class AuthCard extends StatefulWidget {
   final bool? validateUserImmediately;
   final FormFieldValidator<String>? passwordValidator;
   final VoidCallback? onSubmit;
-  final VoidCallback? onSubmitCompleted;
+  final Future<void> Function(BuildContext context)? onSubmitCompleted;
   final bool hideForgotPasswordButton;
   final bool hideSignUpButton;
   final bool loginAfterSignUp;
@@ -387,7 +387,7 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
                 _changeCard(_additionalSignUpIndex),
             onSubmitCompleted: () {
               _forwardChangeRouteAnimation(_loginCardKey).then((_) {
-                widget.onSubmitCompleted?.call();
+                widget.onSubmitCompleted?.call(context);
               });
             },
             requireSignUpConfirmationViaLogin:
@@ -441,7 +441,7 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
               } else if (widget.loginAfterSignUp) {
                 _forwardChangeRouteAnimation(_additionalSignUpCardKey)
                     .then((_) {
-                  widget.onSubmitCompleted?.call();
+                  widget.onSubmitCompleted?.call(context);
                 });
               } else {
                 _changeCard(_loginPageIndex);
@@ -472,7 +472,7 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
             onSubmitCompleted: () {
               if (widget.loginAfterSignUp) {
                 _forwardChangeRouteAnimation(_confirmSignUpCardKey).then((_) {
-                  widget.onSubmitCompleted?.call();
+                  widget.onSubmitCompleted?.call(context);
                 });
               } else {
                 _changeCard(_loginPageIndex);
