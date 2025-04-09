@@ -211,12 +211,12 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
     auth.currentCardIndex = newCardIndex;
 
     setState(() {
+      _pageIndex = newCardIndex;
       _pageController.animateToPage(
         newCardIndex,
         duration: const Duration(milliseconds: 500),
         curve: Curves.ease,
       );
-      _pageIndex = newCardIndex;
     });
   }
 
@@ -385,10 +385,10 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
             onSwitchRecoveryPassword: () => _changeCard(_recoveryIndex),
             onSwitchSignUpAdditionalData: () =>
                 _changeCard(_additionalSignUpIndex),
-            onSubmitCompleted: () {
-              _forwardChangeRouteAnimation(_loginCardKey).then((_) {
-                widget.onSubmitCompleted?.call(context);
-              });
+            onSubmitCompleted: () async {
+              await _forwardChangeRouteAnimation(_loginCardKey);
+              if (!context.mounted) return;
+              await widget.onSubmitCompleted?.call(context);
             },
             requireSignUpConfirmationViaLogin:
                 requireSignUpConfirmationViaLogin,
@@ -439,8 +439,9 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
               if (requireSignupConfirmation) {
                 _changeCard(_confirmSignup);
               } else if (widget.loginAfterSignUp) {
-                widget.onSubmitCompleted?.call(context);
-                _forwardChangeRouteAnimation(_additionalSignUpCardKey);
+                await _forwardChangeRouteAnimation(_additionalSignUpCardKey);
+                if (!context.mounted) return;
+                await widget.onSubmitCompleted?.call(context);
               } else {
                 _changeCard(_loginPageIndex);
               }
@@ -467,10 +468,11 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
                 ? _changeCard(_loginPageIndex)
                 : _changeCard(_additionalSignUpIndex),
             loadingController: formController,
-            onSubmitCompleted: () {
+            onSubmitCompleted: () async {
               if (widget.loginAfterSignUp) {
-                widget.onSubmitCompleted?.call(context);
-                _forwardChangeRouteAnimation(_confirmSignUpCardKey);
+                await _forwardChangeRouteAnimation(_confirmSignUpCardKey);
+                if (!context.mounted) return;
+                await widget.onSubmitCompleted?.call(context);
               } else {
                 _changeCard(_loginPageIndex);
               }
